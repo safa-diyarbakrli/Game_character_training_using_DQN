@@ -42,8 +42,6 @@ class Fireball:
         """Check if fireball is out of bounds and destroyes the fireball if it leaves the map."""
         return not (0 <= self.x <= max_col and 0 <= self.y <= max_row)
     
-
-
 class DungeonDQNEnv(gym.Env):
 
     metadata = {
@@ -247,13 +245,22 @@ class DungeonDQNEnv(gym.Env):
         
         return best_move
     
+    def _update_boss_positions(self):
+        """Update bosses positions"""
+        player_pos = (self.player_row, self.player_col)
+        
+        if self.boss_alive and random.random() < self.boss_move_frequency:
+            new_pos = self._move_toward_target((self.boss_row, self.boss_col), player_pos)
+            self.boss_row, self.boss_col = new_pos
+        
+        if not self.has_mini and random.random() < self.mini_boss_move_frequency:
+            new_pos = self._move_toward_target((self.mini_boss_row, self.mini_boss_col), player_pos)
+            self.mini_boss_row, self.mini_boss_col = new_pos
+    
     def _has_line_of_sight(self, from_pos: Tuple[int, int], to_pos: Tuple[int, int]) -> bool:
         """
         Check if there's a clear line of sight between two positions. (fireball mechanics)
 
-        Uses a variant of Bresenham's line algorithm to trace a path and check
-        for wall collisions. This prevents bosses from shooting through walls.
-        
             1. Determine if path is more horizontal (dx > dy) or vertical (dy > dx)
             2. Trace along the major axis, incrementing minor axis when error accumulates
             3. At each step, check if movement is blocked by wall or lava
@@ -314,18 +321,7 @@ class DungeonDQNEnv(gym.Env):
         
         return True
     
-    def _update_boss_positions(self):
-        """Update bosses positions"""
-        player_pos = (self.player_row, self.player_col)
-        
-        if self.boss_alive and random.random() < self.boss_move_frequency:
-            new_pos = self._move_toward_target((self.boss_row, self.boss_col), player_pos)
-            self.boss_row, self.boss_col = new_pos
-        
-        if not self.has_mini and random.random() < self.mini_boss_move_frequency:
-            new_pos = self._move_toward_target((self.mini_boss_row, self.mini_boss_col), player_pos)
-            self.mini_boss_row, self.mini_boss_col = new_pos
-    
+
     def _spawn_fireball(self):
         """
         Attempt to spawn a fireball from the main boss toward the player.
