@@ -1,4 +1,4 @@
-# Autonomous Dungeon Navigation using Deep Q-Networks (DQN)
+# Deep Q-Network with Prioritized Experience Replay and Curriculum Learning for Dynamic Dungeon Navigation
 
 ## Project Overview
 
